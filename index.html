@@ -6,8 +6,8 @@
 <style>
 body {
   margin: 0;
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(to bottom right, #ffb6c1, #ffc0cb);
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom right, #ff9ecf, #ffcce6);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,26 +18,31 @@ body {
 
 h1 {
   color: white;
+  margin-bottom: 20px;
 }
 
 .game {
   display: grid;
-  grid-template-columns: repeat(4, 120px);
+  grid-template-columns: repeat(4, 110px);
   gap: 15px;
 }
 
 .card {
-  width: 120px;
-  height: 120px;
-  background: white;
-  border-radius: 15px;
-  cursor: pointer;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.5s;
+  width: 110px;
+  height: 110px;
+  perspective: 1000px;
 }
 
-.card.flip {
+.inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  cursor: pointer;
+}
+
+.flip {
   transform: rotateY(180deg);
 }
 
@@ -50,7 +55,7 @@ h1 {
 }
 
 .front {
-  background: #ff69b4;
+  background: hotpink;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,25 +74,42 @@ h1 {
   text-align: center;
   color: white;
   padding: 20px;
+  max-width: 600px;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 25px;
   font-size: 18px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   background: white;
   color: hotpink;
-  margin-top: 15px;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+.heart {
+  position: absolute;
+  color: white;
+  font-size: 20px;
+  animation: float 6s linear infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(100vh); opacity: 1; }
+  100% { transform: translateY(-10vh); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<h1>Match the Memories ❤️</h1>
-
+<h1>Match Our Memories ❤️</h1>
 <div class="game" id="game"></div>
 
 <div id="finalMessage">
@@ -105,7 +127,11 @@ button {
 </div>
 
 <audio id="bgMusic" loop>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+  <source src="love.mp3" type="audio/mp3">
+</audio>
+
+<audio id="finalVoice">
+  <source src="final.mp3" type="audio/mp3">
 </audio>
 
 <script>
@@ -124,12 +150,16 @@ let cards = [...images, ...images];
 cards.sort(() => 0.5 - Math.random());
 
 const game = document.getElementById("game");
-let flipped = [];
-let matched = 0;
+let flippedCards = [];
+let matchedCount = 0;
 
-cards.forEach(img => {
+cards.forEach((img) => {
   const card = document.createElement("div");
   card.classList.add("card");
+
+  const inner = document.createElement("div");
+  inner.classList.add("inner");
+  inner.dataset.image = img;
 
   const front = document.createElement("div");
   front.classList.add("front");
@@ -139,41 +169,62 @@ cards.forEach(img => {
   back.classList.add("back");
   back.style.backgroundImage = `url(${img})`;
 
-  card.appendChild(front);
-  card.appendChild(back);
+  inner.appendChild(front);
+  inner.appendChild(back);
+  card.appendChild(inner);
+  game.appendChild(card);
 
-  card.addEventListener("click", () => {
-    if (card.classList.contains("flip") || flipped.length === 2) return;
-
-    card.classList.add("flip");
-    flipped.push(card);
+  inner.addEventListener("click", () => {
+    if (inner.classList.contains("flip") || flippedCards.length === 2) return;
 
     document.getElementById("bgMusic").play();
+    inner.classList.add("flip");
+    flippedCards.push(inner);
 
-    if (flipped.length === 2) {
-      if (flipped[0].innerHTML === flipped[1].innerHTML) {
-        matched += 2;
-        flipped = [];
-        if (matched === cards.length) {
-          document.querySelector(".game").style.display = "none";
-          document.querySelector("h1").style.display = "none";
-          document.getElementById("finalMessage").style.display = "block";
+    if (flippedCards.length === 2) {
+      if (flippedCards[0].dataset.image === flippedCards[1].dataset.image) {
+        matchedCount += 2;
+        flippedCards = [];
+
+        if (matchedCount === cards.length) {
+          setTimeout(showFinal, 800);
         }
       } else {
         setTimeout(() => {
-          flipped.forEach(c => c.classList.remove("flip"));
-          flipped = [];
+          flippedCards.forEach(card => card.classList.remove("flip"));
+          flippedCards = [];
         }, 800);
       }
     }
   });
-
-  game.appendChild(card);
 });
+
+function showFinal() {
+  document.querySelector(".game").style.display = "none";
+  document.querySelector("h1").style.display = "none";
+  document.getElementById("finalMessage").style.display = "block";
+  document.getElementById("finalVoice").play();
+  createHearts();
+}
 
 function yesClicked() {
   document.getElementById("finalMessage").innerHTML =
-  "<h1>She Said YESSSSS ❤️🎉</h1><h2>I Love You Bhavna 😘</h2>";
+  "<h1>She Said YESSSS ❤️🎉</h1><h2>I Love You Bhavna 😘</h2>";
+  createHearts();
+}
+
+function createHearts() {
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.innerHTML = "❤️";
+    document.body.appendChild(heart);
+
+    setTimeout(() => {
+      heart.remove();
+    }, 6000);
+  }, 300);
 }
 </script>
 
