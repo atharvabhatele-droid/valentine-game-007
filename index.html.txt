@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>For My Choti Gundi ❤️</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(to bottom right, #ffb6c1, #ffc0cb);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+h1 {
+  color: white;
+}
+
+.game {
+  display: grid;
+  grid-template-columns: repeat(4, 120px);
+  gap: 15px;
+}
+
+.card {
+  width: 120px;
+  height: 120px;
+  background: white;
+  border-radius: 15px;
+  cursor: pointer;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+}
+
+.card.flip {
+  transform: rotateY(180deg);
+}
+
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  backface-visibility: hidden;
+}
+
+.front {
+  background: #ff69b4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: white;
+}
+
+.back {
+  transform: rotateY(180deg);
+  background-size: cover;
+  background-position: center;
+}
+
+#finalMessage {
+  display: none;
+  text-align: center;
+  color: white;
+  padding: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: white;
+  color: hotpink;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Match the Memories ❤️</h1>
+
+<div class="game" id="game"></div>
+
+<div id="finalMessage">
+  <h2>
+  Hey my cute little gundi Bhavna ❤️<br><br>
+  I want you to know that I love you.<br>
+  I love all the little things you do.<br>
+  I love the way you carry yourself.<br>
+  I love the way you smile.<br>
+  I love the way you are — completely, beautifully you.<br><br>
+  Love love love… forever and always. ❤️
+  </h2>
+
+  <button onclick="yesClicked()">Will you always be mine? 💍</button>
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+</audio>
+
+<script>
+const images = [
+"images/1.jpg",
+"images/2.jpg",
+"images/3.jpg",
+"images/4.jpg",
+"images/5.jpg",
+"images/6.jpg",
+"images/7.jpg",
+"images/8.jpg"
+];
+
+let cards = [...images, ...images];
+cards.sort(() => 0.5 - Math.random());
+
+const game = document.getElementById("game");
+let flipped = [];
+let matched = 0;
+
+cards.forEach(img => {
+  const card = document.createElement("div");
+  card.classList.add("card");
+
+  const front = document.createElement("div");
+  front.classList.add("front");
+  front.innerHTML = "💖";
+
+  const back = document.createElement("div");
+  back.classList.add("back");
+  back.style.backgroundImage = `url(${img})`;
+
+  card.appendChild(front);
+  card.appendChild(back);
+
+  card.addEventListener("click", () => {
+    if (card.classList.contains("flip") || flipped.length === 2) return;
+
+    card.classList.add("flip");
+    flipped.push(card);
+
+    document.getElementById("bgMusic").play();
+
+    if (flipped.length === 2) {
+      if (flipped[0].innerHTML === flipped[1].innerHTML) {
+        matched += 2;
+        flipped = [];
+        if (matched === cards.length) {
+          document.querySelector(".game").style.display = "none";
+          document.querySelector("h1").style.display = "none";
+          document.getElementById("finalMessage").style.display = "block";
+        }
+      } else {
+        setTimeout(() => {
+          flipped.forEach(c => c.classList.remove("flip"));
+          flipped = [];
+        }, 800);
+      }
+    }
+  });
+
+  game.appendChild(card);
+});
+
+function yesClicked() {
+  document.getElementById("finalMessage").innerHTML =
+  "<h1>She Said YESSSSS ❤️🎉</h1><h2>I Love You Bhavna 😘</h2>";
+}
+</script>
+
+</body>
+</html>
