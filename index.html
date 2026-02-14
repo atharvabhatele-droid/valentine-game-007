@@ -96,7 +96,7 @@ button:hover {
 .heart {
   position: absolute;
   color: white;
-  font-size: 20px;
+  font-size: 22px;
   animation: float 6s linear infinite;
 }
 
@@ -126,10 +126,7 @@ button:hover {
   <button onclick="yesClicked()">Will you always be mine? 💍</button>
 </div>
 
-<audio id="bgMusic" loop>
-  <source src="love.mp3" type="audio/mp3">
-</audio>
-
+<!-- YOUR VOICE AUDIO -->
 <audio id="finalVoice">
   <source src="final.mp3" type="audio/mp3">
 </audio>
@@ -177,7 +174,6 @@ cards.forEach((img) => {
   inner.addEventListener("click", () => {
     if (inner.classList.contains("flip") || flippedCards.length === 2) return;
 
-    document.getElementById("bgMusic").play();
     inner.classList.add("flip");
     flippedCards.push(inner);
 
@@ -203,7 +199,10 @@ function showFinal() {
   document.querySelector(".game").style.display = "none";
   document.querySelector("h1").style.display = "none";
   document.getElementById("finalMessage").style.display = "block";
-  document.getElementById("finalVoice").play();
+
+  let voice = document.getElementById("finalVoice");
+  voice.play().catch(() => {});
+
   createHearts();
 }
 
